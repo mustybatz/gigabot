@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "gigabot"
+version = "0.1.0"
+description = ""
+authors = ["Barush Mendez <barush_mendez-3.0@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.1"
+py-cord = "^2.5.0"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
