@@ -1,5 +1,6 @@
-from bot.bot_setup import run_bot
 import logging.config
+from bot.bot_setup import run_bot
+
 
 logging.config.fileConfig('logging.ini')
 

@@ -1,6 +1,9 @@
-from discord.ext import commands
+import discord
 from bot.commands.base_command import BaseCommand
+from gigabot.adapters.models.crypto_quote import CryptocurrencyQuote
+from gigabot.adapters.models.coin_info import CoinInfo
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
+from gigabot.services.price_service import PriceService
 import logging
 
 from gigabot.adapters.errors import QuoteNotFound, SymbolAddressMismatch
@@ -28,6 +31,7 @@ class PriceCommand(BaseCommand):
         self.symbol = symbol
         self.token_address = token_address
         self.cmc_adapter = CoinMarketCapAdapter()
+        self.price_service = PriceService()
 
     async def execute(self):
         """
@@ -37,26 +41,7 @@ class PriceCommand(BaseCommand):
         and then send this information back to the user through the Discord context.
         """
         print(f"Querying price for {self.symbol} symbol")
-        token_id = None
-        quote = None
+                
+        _, embed = await self.price_service.fetch_cryptocurrency_data(self.token_address, self.symbol)
         
-        try:
-            token_id = self.cmc_adapter.map_to_id(self.token_address, self.symbol)
-        except SymbolAddressMismatch as e:
-            response_message = f"{e.message}"
-            await self.context.respond(response_message)
-            return
-        
-        print(f"Found ID for [{self.symbol}]: {token_id}")
-        
-        try:
-            quote = self.cmc_adapter.get_quote(token_id, self.symbol)
-        except QuoteNotFound as e:
-            response_message = f"{e.message}"
-            await self.context.respond(response_message)
-            return
-
-        response_message = f"The current price of {self.symbol} is {quote.quote.USD.price} USD"
-        
-        
-        await self.context.respond(response_message)
+        await self.context.respond(embed=embed)

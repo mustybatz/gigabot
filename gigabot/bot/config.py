@@ -38,6 +38,7 @@ class Config:
         cls._DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
         cls._COINMARKETCAP_TOKEN = os.getenv('COINMARKETCAP_TOKEN')
         cls._COINMARKETCAP_URL = os.getenv('COINMARKETCAP_URL')
+        cls._DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK')
 
     @property
     def DISCORD_TOKEN(self):
@@ -48,6 +49,16 @@ class Config:
             str: The Discord token.
         """
         return self._DISCORD_TOKEN
+
+    @property
+    def DISCORD_WEBHOOK(self):
+        """
+        Get the Discord webhook from the environment variables.
+
+        Returns:
+            str: The Discord token.
+        """
+        return self._DISCORD_WEBHOOK
 
     @property
     def COINMARKETCAP_TOKEN(self):

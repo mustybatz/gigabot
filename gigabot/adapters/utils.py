@@ -1,5 +1,6 @@
-from typing import Dict
-from adapters.models import CryptocurrencyQuote, Tag, Platform, QuoteDetail, Quote
+from typing import Any, Dict
+from gigabot.adapters.models.crypto_quote import CryptocurrencyQuote, Tag, Platform, QuoteDetail, Quote
+from gigabot.adapters.models.coin_info import CoinInfo, ContractAddress, URLs
 
 def create_cryptocurrency_quote(data: Dict) -> CryptocurrencyQuote:
     # This function assumes that all keys are present and correctly formatted in the data.
@@ -29,4 +30,30 @@ def create_cryptocurrency_quote(data: Dict) -> CryptocurrencyQuote:
         tvl_ratio=data['tvl_ratio'],
         last_updated=data['last_updated'],
         quote=quote
+    )
+
+def create_coin_info(data: Dict[str, Any]) -> CoinInfo:
+    # Extract tag_names and tag_groups with defaults if they are not present
+    tag_names = data.pop('tag-names', [])
+    tag_groups = data.pop('tag-groups', [])
+
+    # Create URLs object from nested data and remove it from data dictionary
+    urls = URLs(**data.pop('urls'))
+
+    # Handle platform data separately if it exists
+    platform_data = data.pop('platform', None)
+    platform = Platform(**platform_data) if platform_data else None
+
+    # Handle contract_address separately and ensure it's not in the data when unpacking to CoinInfo
+    contract_addresses_data = data.pop('contract_address', [])
+    contract_addresses = [ContractAddress(**ca) for ca in contract_addresses_data]
+
+    # Create the CoinInfo object ensuring no duplicate 'contract_address' argument
+    return CoinInfo(
+        tag_names=tag_names,
+        tag_groups=tag_groups,
+        urls=urls,
+        platform=platform,
+        contract_address=contract_addresses,
+        **data
     )

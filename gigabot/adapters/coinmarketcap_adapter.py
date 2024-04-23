@@ -1,8 +1,8 @@
 import requests
-from bot.config import Config
-from adapters.errors import SymbolAddressMismatch, QuoteNotFound
-from adapters.models import CryptocurrencyQuote
-from adapters.utils import create_cryptocurrency_quote
+from gigabot.bot.config import Config
+from gigabot.adapters.errors import SymbolAddressMismatch
+from gigabot.adapters.models.crypto_quote import CryptocurrencyQuote
+from gigabot.adapters.utils import create_cryptocurrency_quote, create_coin_info
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -87,25 +87,44 @@ class CoinMarketCapAdapter:
             QuoteNotFound: If the symbol was not found for the specified ID.
 
         """
-        url = f"{self.BASE_URL}/quotes/latest"
+        url = f"{self.BASE_URL}/v2/cryptocurrency/quotes/latest"
         parameters = {
-            'id': id,
-            'convert': 'USD'
+            'id': id
         }
-        response = requests.get(url, headers=self.headers, params=parameters)
+        response = requests.get(url, headers=self.headers, params=parameters, timeout=60)
         data = response.json()
         if response.status_code == 200:
             try:
-                tokens = data['data'][symbol]
-                
-                for token in tokens:
-                    if token['id'] == id:
-                        return create_cryptocurrency_quote(token)
-                            
-                raise QuoteNotFound('Quote was not found for specified ID.')
+                tokens = data['data'][f'{id}']
+
+                return create_cryptocurrency_quote(tokens)
             except KeyError:
                 logger.error("Error: Cryptocurrency symbol not found or API structure changed.")
                 return None
         else:
             logger.error(f"Error fetching data: {data.get('status', {}).get('error_message', 'Unknown error')}")
+            return None
+
+    def get_coin_info(self, coin_id: int):
+        """
+            Class docstring
+        """
+        url = f"{self.BASE_URL}/v2/cryptocurrency/info"
+        parameters = {
+            'id': coin_id
+        }
+
+        response = requests.get(url, headers=self.headers, params=parameters, timeout=60)
+        data = response.json()
+
+        if response.status_code == 200:
+            try:
+                coin = data['data'][f'{coin_id}']
+
+                return create_coin_info(coin)
+            except KeyError as e:
+                logger.error(e)
+                return None
+        else:
+            logger.error("Error fetching data: %s", data.get('status', {}).get('error_message', 'Unknown error'))
             return None
