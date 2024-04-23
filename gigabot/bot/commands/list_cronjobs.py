@@ -6,7 +6,7 @@ from gigabot.adapters.errors import QuoteNotFound, SymbolAddressMismatch
 
 
 
-class PriceCommand(BaseCommand):
+class ListCronJobs(BaseCommand):
     """
     Command to fetch and display the current price of a specified cryptocurrency.
 
