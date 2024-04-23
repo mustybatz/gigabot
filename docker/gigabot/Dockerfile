@@ -1,6 +1,11 @@
 # Using Python 3.10 base image
 FROM python:3.10
 
+ENV DISCORD_TOKEN token_here
+ENV COINMARKETCAP_TOKEN token_here
+ENV COINMARKETCAP_URL=https://pro-api.coinmarketcap.com
+ENV DISCORD_WEBHOOK webhook
+
 # Install poetry
 RUN pip install poetry
 
@@ -10,10 +15,6 @@ WORKDIR /app
 # Copy necessary files from the host to the container
 COPY pyproject.toml poetry.lock ./
 COPY gigabot/ ./gigabot/
-COPY .env ./
-
-RUN ls -al && sleep 10
-
 
 # Install dependencies using poetry in the project directory
 RUN poetry install
