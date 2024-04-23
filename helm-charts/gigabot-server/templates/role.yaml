@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "gigabot-server.fullname" . }}-role
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["list", "create", "delete"]

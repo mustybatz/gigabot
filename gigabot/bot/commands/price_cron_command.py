@@ -1,6 +1,8 @@
 from discord.ext import commands
+from gigabot.adapters.kubernetes_adapter import KubernetesAdapter
 from gigabot.bot.commands.base_command import BaseCommand
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
+from gigabot.bot.config import Config
 from gigabot.services.price_service import PriceService
 from crontab import CronTab
 import logging
@@ -34,30 +36,35 @@ class PriceCronCommand(BaseCommand):
         self.minute = minute
         self.hour = hour
         self.cmc_adapter = CoinMarketCapAdapter()
+        self.k8s_adapter = KubernetesAdapter()
         self.price_service = PriceService()
+        self.config = Config()
 
     async def execute(self):
         """
         Set up a cron job to run a script that fetches and displays cryptocurrency prices.
         """
-        # Determine the absolute path to the script
-        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'send_price.py'))
+        # Get the CoinMarketCap URL from the environment variables
+        cmc_url = self.config.COINMARKETCAP_URL
 
-        # Create a new cron job using the user 'root'
-        with CronTab(user='mustybatz') as cron:
-            # Construct the command to run the Python script using Poetry
-            command = f'cd /Users/mustybatz/gigabot && poetry run python {script_path} {self.token_address} {self.symbol}'
-            # Create a new job with the command
-            job = cron.new(command=command)
-            # Schedule the job
-            job.minute.on(self.minute)
-            job.hour.on(self.hour)
+        # Get the Discord webhook URL from the environment variables
+        discord_webhook = self.config.DISCORD_WEBHOOK
 
-            # Write the job to the crontab
-            cron.write()
-            print(job.is_valid())
+        # Create a Kubernetes CronJob to run the price fetching script
+        self.k8s_adapter.create_cron_job(
+            namespace="gigabot",
+            name=f"price-cron-{self.symbol}",
+            hours=self.hour,
+            minutes=self.minute,
+            image="registry.digitalocean.com/gigabot/gigabot-task:latest",
+            env_vars={
+                "COINMARKETCAP_URL": cmc_url,
+                "DISCORD_WEBHOOK": discord_webhook,
+                "SYMBOL": self.symbol,
+                "TOKEN_ADDRESS": self.token_address,
+            },
+            secret_name="gigabot-secrets",
+            image_pull_secret="gigabot"
+        )
         
         await self.context.send(f'Cron job for {self.symbol} scheduled to run every {self.hour} hour(s) at minute {self.minute}.')
-
-# Note: You must have the appropriate permissions to modify the crontab for 'root' or any user.
-# Also, ensure that your Poetry environment is correctly set up to run the Python script.

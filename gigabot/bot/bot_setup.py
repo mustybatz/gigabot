@@ -3,6 +3,7 @@ import discord.ext.tasks
 from gigabot.bot.config import Config
 from gigabot.bot.commands.price_command import PriceCommand
 from gigabot.bot.commands.price_cron_command import PriceCronCommand
+from gigabot.bot.commands.list_cronjobs import ListCronJobs
 import logging
 
 import discord.ext
@@ -23,6 +24,11 @@ async def price(ctx, symbol: str, token_address: str):
 @bot.slash_command(name='price-cron', help='Fetch the current price of a cryptocurrency periodically')
 async def price_cron(ctx, symbol: str, token_address: str, minute: int, hour: int):
     command = PriceCronCommand(ctx, symbol, token_address, minute, hour)
+    await command.run()
+
+@bot.slash_command(name='list-cron', help='Fetch the current cronjobs')
+async def price_cron(ctx):
+    command = ListCronJobs(ctx, 'gigabot')
     await command.run()
 
 
