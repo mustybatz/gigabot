@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: registry.digitalocean.com/gigabot/gigabot-srv
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   tag: "latest"
 
 imagePullSecrets:
