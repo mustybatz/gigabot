@@ -44,9 +44,9 @@ class PriceCronCommand(BaseCommand):
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'send_price.py'))
 
         # Create a new cron job using the user 'root'
-        with CronTab(user='root') as cron:
+        with CronTab(user='mustybatz') as cron:
             # Construct the command to run the Python script using Poetry
-            command = f'cd /Users/mustybatz/gigabot && poetry run python {script_path} {self.token_address} {self.symbol} > /tmp/log.txt'
+            command = f'cd /Users/mustybatz/gigabot && poetry run python {script_path} {self.token_address} {self.symbol}'
             # Create a new job with the command
             job = cron.new(command=command)
             # Schedule the job
@@ -55,7 +55,9 @@ class PriceCronCommand(BaseCommand):
 
             # Write the job to the crontab
             cron.write()
-            await self.context.send(f'Cron job for {self.symbol} scheduled to run every {self.hour} hour(s) at minute {self.minute}.')
+            print(job.is_valid())
+        
+        await self.context.send(f'Cron job for {self.symbol} scheduled to run every {self.hour} hour(s) at minute {self.minute}.')
 
 # Note: You must have the appropriate permissions to modify the crontab for 'root' or any user.
 # Also, ensure that your Poetry environment is correctly set up to run the Python script.

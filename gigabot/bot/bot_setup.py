@@ -1,8 +1,8 @@
 import discord
 import discord.ext.tasks
-from bot.config import Config
-from bot.commands.price_command import PriceCommand
-from bot.commands.price_cron_command import PriceCronCommand
+from gigabot.bot.config import Config
+from gigabot.bot.commands.price_command import PriceCommand
+from gigabot.bot.commands.price_cron_command import PriceCronCommand
 import logging
 
 import discord.ext

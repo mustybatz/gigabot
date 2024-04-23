@@ -1,6 +1,7 @@
 import aiohttp
 from discord import Webhook
 import sys
+import os
 from gigabot.bot.config import Config
 from gigabot.services.price_service import PriceService
 
@@ -19,12 +20,9 @@ async def send_message_via_webhook(token_address, symbol):
         await webhook.send(embed=embed, username="GIGABOT")
 
 async def main():
-    if len(sys.argv) != 3:
-        print("Usage: python script_name.py <token_address> <symbol>")
-        return
     
-    token_address = sys.argv[1]
-    symbol = sys.argv[2]
+    token_address = os.getenv('TOKEN_ADDRESS')
+    symbol = os.getenv('SYMBOL')
     await send_message_via_webhook(token_address, symbol)
 
 

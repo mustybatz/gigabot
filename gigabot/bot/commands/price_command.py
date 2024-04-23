@@ -1,15 +1,13 @@
 import discord
-from bot.commands.base_command import BaseCommand
+from gigabot.bot.commands.base_command import BaseCommand
 from gigabot.adapters.models.crypto_quote import CryptocurrencyQuote
 from gigabot.adapters.models.coin_info import CoinInfo
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
 from gigabot.services.price_service import PriceService
-import logging
 
 from gigabot.adapters.errors import QuoteNotFound, SymbolAddressMismatch
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 class PriceCommand(BaseCommand):
     """
