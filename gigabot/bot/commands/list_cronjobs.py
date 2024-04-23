@@ -35,7 +35,7 @@ class ListCronJobs(BaseCommand):
         """
         print(f"Gathering cronjobs for {self.namespace} ns")
                 
-        cronjobs = self.k8s_adapter.get_cron_jobs(self.namespace)
+        cronjobs = self.k8s_adapter.list_cron_jobs(self.namespace)
 
         embed = discord.Embed(title=f"CronJobs in Namespace: {self.namespace}", color=discord.Color.green())
 
