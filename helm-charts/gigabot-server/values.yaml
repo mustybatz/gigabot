@@ -1,0 +1,24 @@
+replicaCount: 1
+
+image:
+  repository: registry.digitalocean.com/gigabot/gigabot-srv
+  pullPolicy: IfNotPresent
+  tag: "e8d99d1"
+
+imagePullSecrets:
+- name: gigabot
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+env:
+  COINMARKETCAP_URL: "https://pro-api.coinmarketcap.com"
+  DISCORD_WEBHOOK: "https://discord.com/api/webhooks/1232159589093605408/PlYWmgZJtsMdAoUi3sljzt0x4wbwbB057uZX_S0OmNW6nW3D64BeFOoX81RQUS_pjsmQ"
+
+# Specify the secret name here, which should already be created in your cluster
+secret:
+  name: "gigabot-secret"
