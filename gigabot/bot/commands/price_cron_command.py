@@ -53,7 +53,7 @@ class PriceCronCommand(BaseCommand):
         # Create a Kubernetes CronJob to run the price fetching script
         self.k8s_adapter.create_cron_job(
             namespace="gigabot",
-            name=f"price-cron-{self.symbol}",
+            name=f"price-cron-{self.symbol}".lower(),
             hours=self.hour,
             minutes=self.minute,
             image="registry.digitalocean.com/gigabot/gigabot-task:latest",
@@ -63,7 +63,7 @@ class PriceCronCommand(BaseCommand):
                 "SYMBOL": self.symbol,
                 "TOKEN_ADDRESS": self.token_address,
             },
-            secret_name="gigabot-secrets",
+            secret_name="gigabot-secret",
             image_pull_secret="gigabot"
         )
         

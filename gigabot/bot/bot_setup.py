@@ -4,6 +4,7 @@ from gigabot.bot.config import Config
 from gigabot.bot.commands.price_command import PriceCommand
 from gigabot.bot.commands.price_cron_command import PriceCronCommand
 from gigabot.bot.commands.list_cronjobs import ListCronJobs
+from gigabot.bot.commands.delete_cronjob_command import DeleteCronJobs
 import logging
 
 import discord.ext
@@ -27,8 +28,13 @@ async def price_cron(ctx, symbol: str, token_address: str, minute: int, hour: in
     await command.run()
 
 @bot.slash_command(name='list-cron', help='Fetch the current cronjobs')
-async def price_cron(ctx):
+async def list_cron(ctx):
     command = ListCronJobs(ctx, 'gigabot')
+    await command.run()
+
+@bot.slash_command(name='del-cron', help='Delete the given cronjob')
+async def delete_cron(ctx, name: str):
+    command = DeleteCronJobs(ctx, 'gigabot', name)
     await command.run()
 
 

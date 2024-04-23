@@ -1,12 +1,6 @@
 # Using Python 3.10 base image
 FROM python:3.10
 
-ENV TOKEN_ADDRESS asd
-ENV SYMBOL GIGA
-ENV DISCORD_TOKEN token_here
-ENV COINMARKETCAP_TOKEN token_here
-ENV COINMARKETCAP_URL=https://pro-api.coinmarketcap.com
-ENV DISCORD_WEBHOOK webhook
 
 # Install poetry
 RUN pip install poetry
