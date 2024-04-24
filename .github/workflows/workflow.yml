@@ -38,15 +38,15 @@ jobs:
       run: doctl registry login --expiry-seconds 1200
 
     - name: Build container image for main Server
-      run: docker build -f docker/gigabot/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ GITHUB_REF }} .
+      run: docker build -f docker/gigabot/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ $GITHUB_REF }} .
       
     
     - name: Push lastest image to DigitalOcean Container Registry
-      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ github.ref }}
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ $GITHUB_REF }}
     
     - name: Build container image for task handler
-      run: docker build -f docker/gigabot-task/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ GITHUB_REF }} .
+      run: docker build -f docker/gigabot-task/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ $GITHUB_REF }} .
       
     - name: Push lastest image to DigitalOcean Container Registry
-      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ GITHUB_REF }}
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ $GITHUB_REF }}
     
