@@ -14,8 +14,8 @@ class KubernetesAdapter:
         within a Kubernetes cluster.
         """
         # Uncomment the following line for local development with a kubeconfig file:
-        config.load_kube_config()
-        #config.load_incluster_config()
+        # config.load_kube_config()
+        config.load_incluster_config()
 
     def create_cron_job(self, namespace, name, hours, minutes, image, env_vars, secret_name, image_pull_secret=None):
         """
