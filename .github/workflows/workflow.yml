@@ -1,5 +1,5 @@
-# This workfow shows how to build a Docker image, tag and push it to DigitalOcean Container Registry, and
-# deploy the application on a DIgitalOcean Kubernetes cluster. For description to the entire worklow, 
+# This workflow shows how to build a Docker image, tag it, and push it to DigitalOcean Container Registry, and
+# deploy the application on a DigitalOcean Kubernetes cluster. For a description of the entire workflow, 
 # see www.digitalocean.com/docs/kubernetes/how-to/deploy-using-github-actions.
 
 name: Build, push, and deploy prod
@@ -21,12 +21,11 @@ jobs:
     # The type of runner that the job will run on.
     runs-on: ubuntu-latest
     
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
-
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-    - name: Checkout master
-      uses: actions/checkout@main
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     # Install doctl.
     - name: Install doctl
@@ -38,15 +37,13 @@ jobs:
       run: doctl registry login --expiry-seconds 1200
 
     - name: Build container image for main Server
-      run: docker build -f docker/gigabot/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ $GITHUB_REF }} .
+      run: docker build -f docker/gigabot/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ github.ref_name }} .
       
-    
-    - name: Push lastest image to DigitalOcean Container Registry
-      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ $GITHUB_REF }}
+    - name: Push latest image to DigitalOcean Container Registry
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-srv:${{ github.ref_name }}
     
     - name: Build container image for task handler
-      run: docker build -f docker/gigabot-task/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ $GITHUB_REF }} .
+      run: docker build -f docker/gigabot-task/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ github.ref_name }} .
       
-    - name: Push lastest image to DigitalOcean Container Registry
-      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ $GITHUB_REF }}
-    
+    - name: Push latest image to DigitalOcean Container Registry
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-task:${{ github.ref_name }}
