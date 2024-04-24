@@ -32,6 +32,17 @@ To deploy the GIGA BOT into a Kubernetes cluster using the Helm chart, follow th
 4. Start the bot: `poetry run python -m gigabot.main`
 
 
+## Deployment with ArgoCD
+To deploy the GIGA BOT using ArgoCD, follow these steps:
+
+1. Create a new release by updating the image tag in the `values.yaml` file of the Helm chart.
+2. Push the updated release to your Git repository.
+3. Open the ArgoCD web interface.
+4. Sync the project by selecting the appropriate Git repository and target revision.
+5. ArgoCD will automatically deploy the updated version of the GIGA BOT to your Kubernetes cluster.
+
+Note: Make sure to update the image tag in the `values.yaml` file before pushing the release to ensure that the latest version of the bot is deployed.
+
 ## License
 
 This project is close source.
