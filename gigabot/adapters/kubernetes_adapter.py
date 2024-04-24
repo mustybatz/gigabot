@@ -46,6 +46,7 @@ class KubernetesAdapter:
                 name="COINMARKETCAP_URL", value=env_vars["COINMARKETCAP_URL"]
             ),
             client.V1EnvVar(name="DISCORD_WEBHOOK", value=env_vars["DISCORD_WEBHOOK"]),
+            client.V1EnvVar(name="SYMBOL", value=env_vars["SYMBOL"]),
             client.V1EnvVar(
                 name="DISCORD_TOKEN",
                 value_from=client.V1EnvVarSource(
