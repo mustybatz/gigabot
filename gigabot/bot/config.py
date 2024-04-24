@@ -39,6 +39,7 @@ class Config:
         cls._COINMARKETCAP_TOKEN = os.getenv('COINMARKETCAP_TOKEN')
         cls._COINMARKETCAP_URL = os.getenv('COINMARKETCAP_URL')
         cls._DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK')
+        cls._CLUSTER_AUTH_MODE = os.getenv('CLUSTER_AUTH_MODE')
 
     @property
     def DISCORD_TOKEN(self):
@@ -79,3 +80,13 @@ class Config:
             str: The CoinMarketCap API URL.
         """
         return self._COINMARKETCAP_URL
+
+    @property
+    def CLUSTER_AUTH_MODE(self):
+        """
+        Get the cluster authentication mode from the environment variables.
+
+        Returns:
+            str: The cluster authentication mode.
+        """
+        return self._CLUSTER_AUTH_MODE

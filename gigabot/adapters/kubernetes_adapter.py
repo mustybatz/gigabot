@@ -2,6 +2,7 @@
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from gigabot.bot.config import Config
 
 
 class KubernetesAdapter:
@@ -14,9 +15,13 @@ class KubernetesAdapter:
         Initializes the adapter by setting up the API access configuration. This setup is designed to be run
         within a Kubernetes cluster.
         """
-        # Uncomment the following line for local development with a kubeconfig file:
-        # config.load_kube_config()
-        config.load_incluster_config()
+        self.config = Config()
+
+        if self.config.CLUSTER_AUTH_MODE == "local":
+            config.load_kube_config()
+        else:
+            config.load_incluster_config()
+        
 
     def create_cron_job(
         self,

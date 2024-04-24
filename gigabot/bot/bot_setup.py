@@ -1,22 +1,38 @@
+import threading
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import discord
-import discord.ext.tasks
-from gigabot.bot.config import Config
+import logging
+from gigabot.bot.commands.delete_cronjob_command import DeleteCronJobs
+from gigabot.bot.commands.list_cronjobs import ListCronJobs
 from gigabot.bot.commands.price_command import PriceCommand
 from gigabot.bot.commands.price_cron_command import PriceCronCommand
-from gigabot.bot.commands.list_cronjobs import ListCronJobs
-from gigabot.bot.commands.delete_cronjob_command import DeleteCronJobs
-import logging
-
-import discord.ext
+from gigabot.bot.config import Config
 
 logger = logging.getLogger(__name__)
 
 bot = discord.Bot()
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+
+class RequestHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+def start_server(port=3000):
+    server_address = ('', port)
+    httpd = ThreadedHTTPServer(server_address, RequestHandler)
+    logger.info(f"Serving HTTP on 0.0.0.0 port {port} (http://0.0.0.0:{port}/)")
+    httpd.serve_forever()
+
 @bot.event
 async def on_ready():
-    print(f"{bot.user} is online and ready!")
-    
+    logger.info(f"{bot.user} is online and ready!")
+
 @bot.slash_command(name='price', help='Fetch the current price of a cryptocurrency')
 async def price(ctx, symbol: str):
     command = PriceCommand(ctx, symbol)
@@ -27,17 +43,24 @@ async def price_cron(ctx, symbol: str, minute: int, hour: int):
     command = PriceCronCommand(ctx, symbol, minute, hour)
     await command.run()
 
-@bot.slash_command(name='list-cron', help='Fetch the current cronjobs')
+@bot.slash_command(name='list-cron', help='List the current cronjobs')
 async def list_cron(ctx):
     command = ListCronJobs(ctx, 'gigabot')
     await command.run()
 
-@bot.slash_command(name='del-cron', help='Delete the given cronjob')
+@bot.slash_command(name='del-cron', help='Delete a specified cronjob')
 async def delete_cron(ctx, name: str):
     command = DeleteCronJobs(ctx, 'gigabot', name)
     await command.run()
 
-
 def run_bot():
     conf = Config()
+
+    # Start the HTTP server on a separate thread
+    server_thread = threading.Thread(target=start_server, args=(3000,), daemon=True)
+    server_thread.start()
+
+    # Now run the Discord bot
     bot.run(conf.DISCORD_TOKEN)
+
+
