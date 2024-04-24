@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: registry.digitalocean.com/gigabot/gigabot-srv
   pullPolicy: Always
-  tag: "e3f0130"
+  tag: "latest"
 
 imagePullSecrets:
 - name: gigabot
