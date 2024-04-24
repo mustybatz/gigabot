@@ -27,9 +27,8 @@ class CoinMarketCapAdapter:
             'Accepts': 'application/json',
             'X-CMC_PRO_API_KEY': self.api_key,
         }
-    
-    
-    
+
+    # Create a function for fetching the CoinMarketCap ID for a given token address    
     def map_to_id(self, token_address: str, symbol: str) -> int:
         """
         Fetches the CoinMarketCap ID for the specified token address.
@@ -61,12 +60,16 @@ class CoinMarketCapAdapter:
         if response.status_code == 200:
             try:
                 for token in data['data']:
-                    if token['platform']['token_address'] == token_address:
+                    tkn:str = token['platform']['token_address']
+                    if tkn.lower() == token_address.lower():
                         return token['id']
                 
                 raise SymbolAddressMismatch('Token Address does not match with any symbol.')
             except KeyError:
                 logger.error("Error: Cryptocurrency symbol not found or API structure changed.")
+                return None
+            except SymbolAddressMismatch as e:
+                logger.error(e)
                 return None
         else:
             logger.error(f"Error fetching data: {data.get('status', {}).get('error_message', 'Unknown error')}")

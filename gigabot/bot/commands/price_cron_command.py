@@ -1,10 +1,8 @@
-from discord.ext import commands
 from gigabot.adapters.kubernetes_adapter import KubernetesAdapter
 from gigabot.bot.commands.base_command import BaseCommand
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
 from gigabot.bot.config import Config
 from gigabot.services.price_service import PriceService
-from crontab import CronTab
 import logging
 import os
 
@@ -19,7 +17,7 @@ class PriceCronCommand(BaseCommand):
     cryptocurrency by interfacing with an external API, such as CoinMarketCap.
     """
 
-    def __init__(self, context, symbol: str, token_address: str, minute: int, hour: int):
+    def __init__(self, context, symbol: str, minute: int, hour: int):
         """
         Initialize the PriceCronCommand with necessary parameters.
 
@@ -32,7 +30,6 @@ class PriceCronCommand(BaseCommand):
         """
         super().__init__(context)
         self.symbol = symbol
-        self.token_address = token_address
         self.minute = minute
         self.hour = hour
         self.cmc_adapter = CoinMarketCapAdapter()
@@ -60,8 +57,7 @@ class PriceCronCommand(BaseCommand):
             env_vars={
                 "COINMARKETCAP_URL": cmc_url,
                 "DISCORD_WEBHOOK": discord_webhook,
-                "SYMBOL": self.symbol,
-                "TOKEN_ADDRESS": self.token_address,
+                "SYMBOL": self.symbol
             },
             secret_name="gigabot-secret",
             image_pull_secret="gigabot"

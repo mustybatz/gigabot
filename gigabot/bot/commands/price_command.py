@@ -17,7 +17,7 @@ class PriceCommand(BaseCommand):
     cryptocurrency by interfacing with an external API, such as CoinMarketCap.
     """
 
-    def __init__(self, context, symbol: str, token_address: str):
+    def __init__(self, context, symbol: str):
         """
         Initialize the PriceCommand with necessary parameters.
 
@@ -27,7 +27,6 @@ class PriceCommand(BaseCommand):
         """
         super().__init__(context)
         self.symbol = symbol
-        self.token_address = token_address
         self.cmc_adapter = CoinMarketCapAdapter()
         self.price_service = PriceService()
 
@@ -40,6 +39,6 @@ class PriceCommand(BaseCommand):
         """
         print(f"Querying price for {self.symbol} symbol")
                 
-        _, embed = await self.price_service.fetch_cryptocurrency_data(self.token_address, self.symbol)
+        _, embed = await self.price_service.fetch_cryptocurrency_data(self.symbol)
         
         await self.context.respond(embed=embed)

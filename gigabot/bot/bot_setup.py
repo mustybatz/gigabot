@@ -18,13 +18,13 @@ async def on_ready():
     print(f"{bot.user} is online and ready!")
     
 @bot.slash_command(name='price', help='Fetch the current price of a cryptocurrency')
-async def price(ctx, symbol: str, token_address: str):
-    command = PriceCommand(ctx, symbol, token_address)
+async def price(ctx, symbol: str):
+    command = PriceCommand(ctx, symbol)
     await command.run()
 
 @bot.slash_command(name='price-cron', help='Fetch the current price of a cryptocurrency periodically')
-async def price_cron(ctx, symbol: str, token_address: str, minute: int, hour: int):
-    command = PriceCronCommand(ctx, symbol, token_address, minute, hour)
+async def price_cron(ctx, symbol: str, minute: int, hour: int):
+    command = PriceCronCommand(ctx, symbol, minute, hour)
     await command.run()
 
 @bot.slash_command(name='list-cron', help='Fetch the current cronjobs')
