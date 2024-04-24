@@ -1,5 +1,3 @@
-# file: gigabot/adapters/kubernetes_adapter.py
-
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 

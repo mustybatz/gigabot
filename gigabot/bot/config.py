@@ -39,6 +39,9 @@ class Config:
         cls._COINMARKETCAP_TOKEN = os.getenv('COINMARKETCAP_TOKEN')
         cls._COINMARKETCAP_URL = os.getenv('COINMARKETCAP_URL')
         cls._DISCORD_WEBHOOK = os.getenv('DISCORD_WEBHOOK')
+        cls._SYMBOL = os.getenv('SYMBOL')
+        cls._ALERT_GREATER_THAN = os.getenv('ALERT_GREATER_THAN')
+        cls._ALERT_LESS_THAN = os.getenv('ALERT_LESS_THAN')
 
     @property
     def DISCORD_TOKEN(self):
@@ -79,3 +82,33 @@ class Config:
             str: The CoinMarketCap API URL.
         """
         return self._COINMARKETCAP_URL
+
+    @property
+    def SYMBOL(self):
+        """
+        Get the cryptocurrency symbol from the environment variables.
+
+        Returns:
+            str: The cryptocurrency symbol.
+        """
+        return self._SYMBOL
+    
+    @property
+    def ALERT_GREATER_THAN(self):
+        """
+        Get the alert threshold for price greater than from the environment variables.
+
+        Returns:
+            str: The alert threshold for price greater than.
+        """
+        return self._ALERT_GREATER_THAN
+    
+    @property
+    def ALERT_LESS_THAN(self):
+        """
+        Get the alert threshold for price less than from the environment variables.
+
+        Returns:
+            str: The alert threshold for price less than.
+        """
+        return self._ALERT_LESS_THAN

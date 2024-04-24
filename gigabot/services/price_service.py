@@ -1,6 +1,8 @@
+from typing import Tuple
 import discord
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
 from gigabot.adapters.dex_screener_adapter import DexScreenerAdapter
+from gigabot.adapters.models.dex_screener_models import Pair
 from gigabot.adapters.errors import SymbolAddressMismatch
 
 
@@ -8,6 +10,39 @@ class PriceService:
     def __init__(self):
         self.cmc_adapter = CoinMarketCapAdapter()
         self.dex_screener_adapter = DexScreenerAdapter()
+
+    async def fetch_dex_screener_data(self, symbol: str) -> Tuple[str, Pair]:
+        try:
+            search = self.dex_screener_adapter.search_pairs(symbol)
+            for p in search.pairs:
+                if p.dexId in ("raydium", "uniswap"):
+                    pair = p
+                    break
+
+                return "Token not found", None
+
+        except Exception as e:
+            return f"{e}", None
+
+        return None, pair
+
+    async def format_alert_message(self, pair: Pair, gt: bool, lt: bool, value: float) -> discord.Embed:
+        emoji = "📢" if gt else "🔔" if lt else ""
+        operator = ">" if gt else "<" if lt else ""
+        message = f"{emoji} {pair.baseToken.symbol} is {operator} {value}%"
+        
+        embed = discord.Embed(
+            title="Alert Message",
+            description=message,
+            color=discord.Colour.blurple(),
+        )
+        embed.set_footer(text="Thanks for using our bot.")
+        embed.set_author(
+            name="GIGABOT",
+            icon_url="https://w0.peakpx.com/wallpaper/927/822/HD-wallpaper-triplechad-gigachad.jpg",
+            url=pair.baseToken.address,
+        )
+        return embed
 
     async def fetch_cryptocurrency_data(self, symbol):
 

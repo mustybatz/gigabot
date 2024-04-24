@@ -1,13 +1,14 @@
+import logging
 from gigabot.adapters.kubernetes_adapter import KubernetesAdapter
 from gigabot.bot.commands.base_command import BaseCommand
 from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
 from gigabot.bot.config import Config
 from gigabot.services.price_service import PriceService
-import logging
-import os
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class PriceCronCommand(BaseCommand):
     """
@@ -41,10 +42,11 @@ class PriceCronCommand(BaseCommand):
         """
         Set up a cron job to run a script that fetches and displays cryptocurrency prices.
         """
-        # Get the CoinMarketCap URL from the environment variables
-        cmc_url = self.config.COINMARKETCAP_URL
+        # Acknowledge the command immediately
+        await self.context.defer()
 
-        # Get the Discord webhook URL from the environment variables
+        # Proceed with your long-running task
+        cmc_url = self.config.COINMARKETCAP_URL
         discord_webhook = self.config.DISCORD_WEBHOOK
 
         # Create a Kubernetes CronJob to run the price fetching script
@@ -57,10 +59,13 @@ class PriceCronCommand(BaseCommand):
             env_vars={
                 "COINMARKETCAP_URL": cmc_url,
                 "DISCORD_WEBHOOK": discord_webhook,
-                "SYMBOL": self.symbol
+                "SYMBOL": self.symbol,
             },
             secret_name="gigabot-secret",
-            image_pull_secret="gigabot"
+            image_pull_secret="gigabot",
         )
-        
-        await self.context.send(f'Cron job for {self.symbol} scheduled to run every {self.hour} hour(s) at minute {self.minute}.')
+
+        # Respond after the operation
+        await self.context.followup.send(
+            f"Cron job for {self.symbol} scheduled to run every {self.hour} hour(s) at minute {self.minute}."
+        )
