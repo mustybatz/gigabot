@@ -17,7 +17,7 @@ serviceAccount:
 
 env:
   COINMARKETCAP_URL: "https://pro-api.coinmarketcap.com"
-  DISCORD_WEBHOOK: "https://discord.com/api/webhooks/1232159589093605408/PlYWmgZJtsMdAoUi3sljzt0x4wbwbB057uZX_S0OmNW6nW3D64BeFOoX81RQUS_pjsmQ"
+  DISCORD_WEBHOOK: "https://discord.com/api/webhooks/1232504195442020382/lumCFx7zfkHg5RejgndwMGz6x6TLRVH-ye5-WdkL3T378fRw8dSTiR74bY9OPNyjrCxz"
 
 # Specify the secret name here, which should already be created in your cluster
 secret:

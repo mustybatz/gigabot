@@ -3,6 +3,7 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
+
 class KubernetesAdapter:
     """
     A class to manage interactions with the Kubernetes API, specifically for creating, deleting, and listing cron jobs.
@@ -17,7 +18,17 @@ class KubernetesAdapter:
         # config.load_kube_config()
         config.load_incluster_config()
 
-    def create_cron_job(self, namespace, name, hours, minutes, image, env_vars, secret_name, image_pull_secret=None):
+    def create_cron_job(
+        self,
+        namespace,
+        name,
+        hours,
+        minutes,
+        image,
+        env_vars,
+        secret_name,
+        image_pull_secret=None,
+    ):
         """
         Creates a Kubernetes CronJob resource within a specified namespace with provided environment variables and secrets.
         """
@@ -31,20 +42,26 @@ class KubernetesAdapter:
 
         # Setup environment variables from static values and secrets
         env_list = [
-            client.V1EnvVar(name="COINMARKETCAP_URL", value=env_vars["COINMARKETCAP_URL"]),
+            client.V1EnvVar(
+                name="COINMARKETCAP_URL", value=env_vars["COINMARKETCAP_URL"]
+            ),
             client.V1EnvVar(name="DISCORD_WEBHOOK", value=env_vars["DISCORD_WEBHOOK"]),
             client.V1EnvVar(
                 name="DISCORD_TOKEN",
                 value_from=client.V1EnvVarSource(
-                    secret_key_ref=client.V1SecretKeySelector(name=secret_name, key="discord_token")
-                )
+                    secret_key_ref=client.V1SecretKeySelector(
+                        name=secret_name, key="discord_token"
+                    )
+                ),
             ),
             client.V1EnvVar(
                 name="COINMARKETCAP_TOKEN",
                 value_from=client.V1EnvVarSource(
-                    secret_key_ref=client.V1SecretKeySelector(name=secret_name, key="coinmarketcap_token")
-                )
-            )
+                    secret_key_ref=client.V1SecretKeySelector(
+                        name=secret_name, key="coinmarketcap_token"
+                    )
+                ),
+            ),
         ]
 
         container = client.V1Container(
@@ -52,23 +69,26 @@ class KubernetesAdapter:
         )
 
         # Add imagePullSecrets if provided
-        image_pull_secrets = [client.V1LocalObjectReference(name=image_pull_secret)] if image_pull_secret else None
+        image_pull_secrets = (
+            [client.V1LocalObjectReference(name=image_pull_secret)]
+            if image_pull_secret
+            else None
+        )
 
         # Define the Job spec
         job_spec = client.V1JobSpec(
             template=client.V1PodTemplateSpec(
                 spec=client.V1PodSpec(
-                    restart_policy='OnFailure',
+                    restart_policy="OnFailure",
                     containers=[container],
-                    image_pull_secrets=image_pull_secrets
+                    image_pull_secrets=image_pull_secrets,
                 )
             )
         )
 
         # Define the CronJob spec using V1CronJobSpec which now replaces V1beta1CronJobSpec
         cron_job_spec = client.V1CronJobSpec(
-            schedule=schedule,
-            job_template=client.V1JobTemplateSpec(spec=job_spec)
+            schedule=schedule, job_template=client.V1JobTemplateSpec(spec=job_spec)
         )
 
         # Create the CronJob using V1CronJob which now replaces V1beta1CronJob
@@ -76,7 +96,7 @@ class KubernetesAdapter:
             api_version="batch/v1",
             kind="CronJob",
             metadata=client.V1ObjectMeta(name=name),
-            spec=cron_job_spec
+            spec=cron_job_spec,
         )
 
         try:
@@ -91,9 +111,7 @@ class KubernetesAdapter:
         """
         batch_v1 = client.BatchV1Api()
         try:
-            api_response = batch_v1.delete_namespaced_cron_job(
-                name, namespace
-            )
+            api_response = batch_v1.delete_namespaced_cron_job(name, namespace)
             print(f"CronJob deleted. status='{str(api_response.status)}'")
         except ApiException as e:
             print(f"An error occurred: {str(e)}")

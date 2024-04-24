@@ -20,10 +20,8 @@ async def send_message_via_webhook(symbol):
         await webhook.send(embed=embed, username="GIGABOT")
 
 async def main():
-    
-    token_address = os.getenv('TOKEN_ADDRESS')
     symbol = os.getenv('SYMBOL')
-    await send_message_via_webhook(token_address, symbol)
+    await send_message_via_webhook(symbol)
 
 
 import asyncio
