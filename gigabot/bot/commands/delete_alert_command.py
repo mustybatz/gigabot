@@ -1,8 +1,6 @@
 import logging
-from typing import List
-
 import discord
-from gigabot.adapters.kubernetes_adapter import ExistingDeployment, KubernetesAdapter
+from gigabot.adapters.kubernetes_adapter import KubernetesAdapter
 from gigabot.bot.commands.base_command import BaseCommand
 from gigabot.bot.config import Config
 
@@ -22,7 +20,6 @@ class DeleteAlertCommand(BaseCommand):
         name: The name of the alert to delete.
         """
         super().__init__(context)
-        
         self.config = Config()
         self.name = name
         self.k8s_adapter = KubernetesAdapter()
@@ -36,14 +33,9 @@ class DeleteAlertCommand(BaseCommand):
 
         depls = self.k8s_adapter.list_deployments("gigabot-dev")
 
-        embed = discord.Embed(title="List of Alerts", color=discord.Color.blue())
-
         for depl in depls:
             if depl.metadata.name == self.name:
                 self.k8s_adapter.delete_deployment("gigabot-dev", depl.metadata.name)
 
         await self.context.followup.send(f"Deleted alert {self.name}")
-        
-        
-
         
