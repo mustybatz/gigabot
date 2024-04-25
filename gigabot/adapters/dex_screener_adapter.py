@@ -31,7 +31,7 @@ class DexScreenerAdapter:
         """
         url = f"{self.BASE_URL}/pairs/{chain_id}/{pair_addresses}"
         try:
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=10, headers={'Cache-Control': 'no-cache'})
             response.raise_for_status()
             data = response.json()
             pairs = []

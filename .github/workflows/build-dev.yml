@@ -38,6 +38,22 @@ jobs:
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
+    - name: Build container image for alerts Server
+      run: docker build -f docker/gigabot-alert/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-alerts:$(echo $GITHUB_SHA | head -c7) .
+
+    - name: Tag latest image
+      run: docker tag ${{ secrets.REGISTRY_NAME }}/gigabot-alert:$(echo $GITHUB_SHA | head -c7) ${{ secrets.REGISTRY_NAME }}/gigabot-alerts:latest
+      env:
+        DOCKER_CLI_EXPERIMENTAL: enabled
+
+
+    - name: Push SHA image to DigitalOcean Container Registry
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-alerts:$(echo $GITHUB_SHA | head -c7)
+      
+    
+    - name: Push lastest image to DigitalOcean Container Registry
+      run: docker push ${{ secrets.REGISTRY_NAME }}/gigabot-alerts:latest    
+
     - name: Build container image for main Server
       run: docker build -f docker/gigabot/Dockerfile -t ${{ secrets.REGISTRY_NAME }}/gigabot-srv:$(echo $GITHUB_SHA | head -c7) .
 
