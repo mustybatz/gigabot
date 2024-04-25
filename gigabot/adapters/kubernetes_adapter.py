@@ -1,6 +1,9 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
+class ExistingDeployment(Exception):
+    pass
+
 class KubernetesAdapter:
     """
     A class to manage interactions with the Kubernetes API, specifically for creating, deleting, editing, and listing Deployments and Cron Jobs.
@@ -11,7 +14,7 @@ class KubernetesAdapter:
         Initializes the adapter by setting up the API access configuration. This setup is designed to be run
         within a Kubernetes cluster.
         """
-        config.load_incluster_config()
+        config.load_config()
 
     def create_deployment(
         self,
@@ -35,6 +38,12 @@ class KubernetesAdapter:
             replicas (int): The number of replicas for the deployment.
             image_pull_secret (str, optional): The name of the Kubernetes imagePullSecrets to use for pulling the docker image.
         """
+        depls = self.list_deployments(namespace)
+
+        for d in depls:
+            if name == d.metadata.name:
+                raise ExistingDeployment(f"Deployment {name} already exists")
+
         apps_v1 = client.AppsV1Api()
 
         # Setup environment variables from static values and secrets

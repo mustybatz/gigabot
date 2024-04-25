@@ -1,10 +1,8 @@
 import logging
 from typing import List
-from gigabot.adapters.kubernetes_adapter import KubernetesAdapter
+from gigabot.adapters.kubernetes_adapter import ExistingDeployment, KubernetesAdapter
 from gigabot.bot.commands.base_command import BaseCommand
-from gigabot.adapters.coinmarketcap_adapter import CoinMarketCapAdapter
 from gigabot.bot.config import Config
-from gigabot.services.price_service import PriceService
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +14,7 @@ class AlertCommand(BaseCommand):
     A command to set up price alerts for a specific cryptocurrency.
     """
 
-    def __init__(self, context, symbol: str, above_than: List[float], below_than: List[float]):
+    def __init__(self, context, symbol: str, above_than: str, below_than: str):
         """
         Initializes the command with the symbol of the cryptocurrency and the price thresholds for the alert.
         symbol: The symbol of the cryptocurrency to set up the alert for.
@@ -35,20 +33,43 @@ class AlertCommand(BaseCommand):
         Execute the command to fetch the price of the specified cryptocurrency.
         """
 
+        await self.context.defer()
+
+        # Proceed with your long-running task
+        cmc_url = self.config.COINMARKETCAP_URL
+        discord_webhook = self.config.DISCORD_WEBHOOK
+
+
         # Create instances of the adapters and services
         kubernetes_adapter = KubernetesAdapter()
+
+        name = f"price-alert-{self.symbol}".lower()
         
-        kubernetes_adapter.create_deployment(
-            namespace=self.config.KUBERNETES_NAMESPACE,
-            name="price-alert",
-            image=self.config.KUBERNETES_IMAGE,
-            env_vars={
-                "SYMBOL": self.symbol,
-                "ABOVE_THAN": ",".join(map(str, self.above_than)),
-                "BELOW_THAN": ",".join(map(str, self.below_than)),
-            },
-            secret_name=self.config.KUBERNETES_SECRET_NAME,
-            replicas=1,
+        try:
+            kubernetes_adapter.create_deployment(
+                namespace="gigabot-dev",
+                name=name,
+                image="registry.digitalocean.com/gigabot/gigabot-alert:latest",
+                env_vars={
+                    "SYMBOL": self.symbol,
+                    "ALERT_GREATER_THAN": self.above_than,
+                    "ALERT_LESS_THAN": self.below_than,
+                    "COINMARKETCAP_URL": cmc_url,
+                    "DISCORD_WEBHOOK": discord_webhook  
+                },
+                secret_name="gigabot-secret-dev",
+                replicas=1,
+                image_pull_secret="gigabot"
+            )
+        except ExistingDeployment as e:
+            logger.error(f"Deployment already exists: {e}")
+
+            await self.context.followup.send("Deployment already exists")
+            return
+
+        await self.context.followup.send(
+            "Deployment created"
         )
+        
 
         

@@ -3,7 +3,10 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 import discord
 import logging
+from gigabot.bot.commands.alert_command import AlertCommand
+from gigabot.bot.commands.delete_alert_command import DeleteAlertCommand
 from gigabot.bot.commands.delete_cronjob_command import DeleteCronJobs
+from gigabot.bot.commands.list_alerts_command import ListAlertsCommand
 from gigabot.bot.commands.list_cronjobs import ListCronJobs
 from gigabot.bot.commands.price_command import PriceCommand
 from gigabot.bot.commands.price_cron_command import PriceCronCommand
@@ -51,6 +54,21 @@ async def list_cron(ctx):
 @bot.slash_command(name='del-cron', help='Delete a specified cronjob')
 async def delete_cron(ctx, name: str):
     command = DeleteCronJobs(ctx, 'gigabot', name)
+    await command.run()
+
+@bot.slash_command(name='alert', help='Set up price alerts for a specific cryptocurrency')
+async def alert(ctx, symbol: str, above_than: str, below_than: str):
+    command = AlertCommand(ctx, symbol, above_than, below_than)
+    await command.run()
+
+@bot.slash_command(name='list-alerts', help='List the current alerts')
+async def list_alerts(ctx):
+    command = ListAlertsCommand(ctx)
+    await command.run()
+
+@bot.slash_command(name='del-alert', help='Delete a specified alert')
+async def delete_alert(ctx, name: str):
+    command = DeleteAlertCommand(ctx, name)
     await command.run()
 
 def run_bot():
