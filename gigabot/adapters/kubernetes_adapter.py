@@ -14,7 +14,7 @@ class KubernetesAdapter:
         Initializes the adapter by setting up the API access configuration. This setup is designed to be run
         within a Kubernetes cluster.
         """
-        config.load_config()
+        config.incluster_config()
 
     def create_deployment(
         self,
