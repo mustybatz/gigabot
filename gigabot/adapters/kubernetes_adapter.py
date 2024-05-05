@@ -1,8 +1,10 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
+
 class ExistingDeployment(Exception):
     pass
+
 
 class KubernetesAdapter:
     """
@@ -109,7 +111,6 @@ class KubernetesAdapter:
         except ApiException as e:
             print(f"An error occurred: {str(e)}")
 
-
     def list_deployments(self, namespace):
         apps_v1 = client.AppsV1Api()
         try:
@@ -129,26 +130,57 @@ class KubernetesAdapter:
         except ApiException as e:
             print(f"An error occurred: {str(e)}")
 
-    def update_deployment(self, namespace, name, image=None, env_vars=None, replicas=None):
+    def update_deployment(
+        self, namespace, name, image=None, env_vars=None, replicas=None
+    ):
         apps_v1 = client.AppsV1Api()
         deployment = apps_v1.read_namespaced_deployment(name, namespace)
         if image:
             deployment.spec.template.spec.containers[0].image = image
         if env_vars:
-            deployment.spec.template.spec.containers[0].env = self._create_env_list(env_vars, deployment.spec.template.spec.containers[0].env[0].value_from.secret_key_ref.name)
+            deployment.spec.template.spec.containers[0].env = self._create_env_list(
+                env_vars,
+                deployment.spec.template.spec.containers[0]
+                .env[0]
+                .value_from.secret_key_ref.name,
+            )
         if replicas is not None:
             deployment.spec.replicas = replicas
         try:
-            api_response = apps_v1.patch_namespaced_deployment(name, namespace, deployment)
+            api_response = apps_v1.patch_namespaced_deployment(
+                name, namespace, deployment
+            )
             print(f"Deployment updated. status='{api_response.status}'")
         except ApiException as e:
             print(f"An error occurred: {str(e)}")
 
     def _create_env_list(self, env_vars, secret_name):
         """Helper method to create a list of environment variables."""
-        env_list = [client.V1EnvVar(name=key, value=env_vars[key]) for key in env_vars if key not in ["DISCORD_TOKEN", "COINMARKETCAP_TOKEN"]]
-        env_list.append(client.V1EnvVar(name="DISCORD_TOKEN", value_from=client.V1EnvVarSource(secret_key_ref=client.V1SecretKeySelector(name=secret_name, key="discord_token"))))
-        env_list.append(client.V1EnvVar(name="COINMARKETCAP_TOKEN", value_from=client.V1EnvVarSource(secret_key_ref=client.V1SecretKeySelector(name=secret_name, key="coinmarketcap_token"))))
+        env_list = [
+            client.V1EnvVar(name=key, value=env_vars[key])
+            for key in env_vars
+            if key not in ["DISCORD_TOKEN", "COINMARKETCAP_TOKEN"]
+        ]
+        env_list.append(
+            client.V1EnvVar(
+                name="DISCORD_TOKEN",
+                value_from=client.V1EnvVarSource(
+                    secret_key_ref=client.V1SecretKeySelector(
+                        name=secret_name, key="discord_token"
+                    )
+                ),
+            )
+        )
+        env_list.append(
+            client.V1EnvVar(
+                name="COINMARKETCAP_TOKEN",
+                value_from=client.V1EnvVarSource(
+                    secret_key_ref=client.V1SecretKeySelector(
+                        name=secret_name, key="coinmarketcap_token"
+                    )
+                ),
+            )
+        )
         return env_list
 
     # Existing methods for CronJobs...

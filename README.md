@@ -35,3 +35,8 @@ To deploy the GIGA BOT into a Kubernetes cluster using the Helm chart, follow th
 ## License
 
 This project is close source.
+
+
+# Design Patterns
+- Singleton - Config class
+- 

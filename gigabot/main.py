@@ -1,4 +1,4 @@
-from gigabot.bot.bot_setup import run_bot
+from gigabot.bot.bot_setup import Bot
 
 if __name__ == "__main__":
-    run_bot()
+    Bot.run_bot()
